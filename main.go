@@ -8,5 +8,5 @@ import (
 
 func main() {
 	message := hello("")
-	fmt.Println(aurora.Yellow(message))
+	fmt.Println(aurora.Blue(message))
 }
