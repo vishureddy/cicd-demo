@@ -5,8 +5,10 @@ pipeline{
           } 
         environment{
                 DOCKER_TAG = getDockerTag()
-                DOCKER_REGISTRY_URL  = "192.168.43.173:5000"
+                DOCKER_REGISTRY_URL  = "localhost:5000"
+                K8S_URL = "192.168.43.173:5000"
                 IMAGE_URL_WITH_TAG = "${DOCKER_REGISTRY_URL}/go-app:${DOCKER_TAG}"
+                K8S_IMAGE_URL_WITH_TAG = "${K8S_URL}/go-app:${DOCKER_TAG}"
         }
         stages{
                 stage("SCM Checkout") {
@@ -46,7 +48,7 @@ pipeline{
                 }
                 stage("Deploying the image to k8's cluster"){
                         steps{
-                                sh "kubectl create deployment hello-go --image ${IMAGE_URL_WITH_TAG}"
+                                sh "kubectl create deployment hello-go --image ${K8S_IMAGE_URL_WITH_TAG}"
                         }
                 }
 
