@@ -1,11 +1,33 @@
 pipeline{
         agent any
+        tools {
+               go 'default-go'
+          } 
         environment{
                 DOCKER_TAG = getDockerTag()
                 DOCKER_REGISTRY_URL  = "localhost:5000"
                 IMAGE_URL_WITH_TAG = "${DOCKER_REGISTRY_URL}/go-app:${DOCKER_TAG}"
         }
         stages{
+                stage("SCM Checkout") {
+                        steps {
+                                git 'https://github.com/vishureddy/Jenkins_CI.git'
+                        }
+                }
+                stage("Pre-Test---Getting Dependency packages") {
+                        steps {
+                                sh "go get -u golang.org/x/lint/golint"
+                                sh "go get -u github.com/logrusorgru/aurora"
+                        }
+                }
+                stage("Testing") {
+                        steps {
+                                sh "go fmt"
+                                sh "go vet"
+                                sh "go run -race ."
+                                sh "go test"
+                        }
+                }
                 stage('Buid Docker Image'){
                         steps{
                                 sh "sudo docker build . -t ${IMAGE_URL_WITH_TAG}"
@@ -22,22 +44,7 @@ pipeline{
                                 sh "curl -X GET http://localhost:5000/v2/_catalog"
                         }
                 }
-                stage("Deploy to k8's"){
-                        steps{
-                                sh "chmod +x changeTag.sh"
-                                sh "./changeTag.sh ${DOCKER_TAG}"
-                                sh "scp -o StrictHostKeyChecking=no services.yaml node-app-pod.yaml visweswara@:192.168.43.173/home/visweswara/jjj/"
-                                script{
-	                         try{
-                                 sh "ssh visweswara@192.168.43.173 kubectl apply -f ."
-                                }catch(error){
-                                        sh "ssh visweswara@192.168.43.173 kubectl create -f ."
 
-                                  }
-                        }
-
-                }
-        }
 }
 }
 
