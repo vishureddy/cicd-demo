@@ -5,13 +5,13 @@ pipeline{
           } 
         environment{
                 DOCKER_TAG = getDockerTag()
-                DOCKER_REGISTRY_URL  = "localhost:5000"
+                DOCKER_REGISTRY_URL  = "192.168.43.173:5000"
                 IMAGE_URL_WITH_TAG = "${DOCKER_REGISTRY_URL}/go-app:${DOCKER_TAG}"
         }
         stages{
                 stage("SCM Checkout") {
                         steps {
-                                git 'https://github.com/vishureddy/Jenkins_CI.git'
+                                git 'https://github.com/vishureddy/cicd-demo.git'
                         }
                 }
                 stage("Pre-Test---Getting Dependency packages") {
@@ -42,6 +42,11 @@ pipeline{
                 stage('Testing Docker image in the registry'){
                         steps{
                                 sh "curl -X GET http://localhost:5000/v2/_catalog"
+                        }
+                }
+                stage("Deploying the image to k8's cluster"){
+                        steps{
+                                sh "kubectl create deployment hello-go --image ${IMAGE_URL_WITH_TAG}"
                         }
                 }
 
