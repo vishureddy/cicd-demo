@@ -48,8 +48,7 @@ pipeline{
                 }
                 stage("Deploying the image to k8's cluster"){
                         steps{
-                                sh "echo ${K8S_IMAGE_URL_WITH_TAG}"
-                                sh "kubectl set image deployment/hello-go hello-go=${K8S_IMAGE_URL_WITH_TAG}"
+                                sh "kubectl create deployment hello-go --image=${K8S_IMAGE_URL_WITH_TAG}"
                         }
                 }
 
