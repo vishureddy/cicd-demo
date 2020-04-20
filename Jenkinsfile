@@ -28,6 +28,7 @@ pipeline{
                                 sh "go vet"
                                 sh "go run -race ."
                                 sh "go test"
+                                sh "go test --cover"
                         }
                 }
                 stage('Buid Docker Image'){
